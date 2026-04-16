@@ -1,0 +1,2 @@
+# SMART_CHAIN-_-STORE-_ASSISTANT_SYSTEM
+Microservice
