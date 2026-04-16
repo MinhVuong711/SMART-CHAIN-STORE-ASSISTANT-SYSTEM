@@ -1,0 +1,23 @@
+{
+  "name": "microservices-project",
+  "version": "1.0.0",
+  "description": "Microservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MinhVuong711/SMART-CHAIN-STORE-ASSISTANT-SYSTEM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MinhVuong711/SMART-CHAIN-STORE-ASSISTANT-SYSTEM/issues"
+  },
+  "homepage": "https://github.com/MinhVuong711/SMART-CHAIN-STORE-ASSISTANT-SYSTEM#readme",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3"
+  }
+}

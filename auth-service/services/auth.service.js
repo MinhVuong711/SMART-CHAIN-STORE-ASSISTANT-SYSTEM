@@ -13,7 +13,7 @@ exports.register = async (data) => {
 
   const hash = await bcrypt.hash(password, 10);
 
-  // 🔥 LUÔN LÀ STAFF
+  // LUÔN LÀ STAFF
   const userRole = "staff";
 
   await db.query(
