@@ -4,14 +4,16 @@ const SECRET = process.env.JWT_SECRET;
 
 // VERIFY TOKEN
 exports.verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"];
+  const authHeader = req.headers["authorization"];
 
-  if (!token) {
-    return res.status(403).json({ message: "No token provided" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(403).json({ message: "Invalid token format" });
   }
 
+  const token = authHeader.split(" ")[1];
+
   try {
-    const decoded = jwt.verify(token.replace("Bearer ", ""), SECRET);
+    const decoded = jwt.verify(token, SECRET);
     req.user = decoded;
     next();
   } catch (err) {
@@ -22,9 +24,14 @@ exports.verifyToken = (req, res, next) => {
 // CHECK ROLE (DYNAMIC)
 exports.checkRole = (roles) => {
   return (req, res, next) => {
+    if (!Array.isArray(roles)) {
+      return res.status(500).json({ message: "Roles must be an array" });
+    }
+
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({ message: "Forbidden" });
     }
+
     next();
   };
 };

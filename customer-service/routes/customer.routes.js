@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/customer.controller");
-const { verifyToken, checkRole } = require("../middleware/auth.middleware");
+const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
 // CREATE → admin + staff
 router.post("/", verifyToken, checkRole(["admin", "staff"]), controller.create);
@@ -11,10 +11,20 @@ router.post("/", verifyToken, checkRole(["admin", "staff"]), controller.create);
 router.get("/", verifyToken, checkRole(["admin", "staff"]), controller.getAll);
 
 // GET BY ID → admin + staff
-router.get("/:id", verifyToken, checkRole(["admin", "staff"]), controller.getById);
+router.get(
+  "/:id",
+  verifyToken,
+  checkRole(["admin", "staff"]),
+  controller.getById,
+);
 
 // UPDATE → admin + staff
-router.put("/:id", verifyToken, checkRole(["admin", "staff"]), controller.update);
+router.put(
+  "/:id",
+  verifyToken,
+  checkRole(["admin", "staff"]),
+  controller.update,
+);
 
 // DELETE → chỉ admin
 router.delete("/:id", verifyToken, checkRole(["admin"]), controller.remove);

@@ -45,28 +45,39 @@ exports.getById = async (req, res) => {
   }
 };
 
-// CREATE (ADMIN ONLY - đã check ở middleware)
+// CREATE (ADMIN ONLY)
 exports.create = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const { store_id } = req.params;
     const { name, price, description = "" } = req.body;
 
+    const parsedStoreId = Number(store_id);
     const parsedPrice = Number(price);
 
+    // validate input
     if (
       !name ||
       isNaN(parsedPrice) ||
       parsedPrice <= 0 ||
-      !Number.isInteger(Number(store_id))
+      !Number.isInteger(parsedStoreId)
     ) {
       return res.status(400).json({ error: "Invalid data" });
+    }
+
+    // 🔥 CHECK QUYỀN STORE (QUAN TRỌNG NHẤT)
+    if (req.user.store_id !== parsedStoreId) {
+      return res.status(403).json({ error: "Forbidden: wrong store" });
     }
 
     const result = await service.create({
       name,
       price: parsedPrice,
       description,
-      store_id: Number(store_id),
+      store_id: parsedStoreId,
     });
 
     res.status(201).json(result);
@@ -78,6 +89,10 @@ exports.create = async (req, res) => {
 // UPDATE (ADMIN ONLY)
 exports.update = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const { id, store_id } = req.params;
     const { name, price, description } = req.body;
 
@@ -95,7 +110,12 @@ exports.update = async (req, res) => {
       return res.status(400).json({ error: "Invalid store_id" });
     }
 
-    // phải có ít nhất 1 field để update
+    // 🔥 CHECK QUYỀN STORE
+    if (req.user.store_id !== parsedStoreId) {
+      return res.status(403).json({ error: "Forbidden: wrong store" });
+    }
+
+    // phải có ít nhất 1 field
     if (
       name === undefined &&
       parsedPrice === undefined &&
@@ -104,7 +124,7 @@ exports.update = async (req, res) => {
       return res.status(400).json({ error: "No data to update" });
     }
 
-    // validate price nếu có gửi
+    // validate price
     if (parsedPrice !== undefined && (isNaN(parsedPrice) || parsedPrice <= 0)) {
       return res.status(400).json({ error: "Invalid price" });
     }
@@ -130,19 +150,31 @@ exports.update = async (req, res) => {
 // DELETE (ADMIN ONLY)
 exports.remove = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const { id, store_id } = req.params;
 
-    // ✅ validate id
-    if (!Number.isInteger(Number(id))) {
+    const parsedId = Number(id);
+    const parsedStoreId = Number(store_id);
+
+    // validate id
+    if (!Number.isInteger(parsedId)) {
       return res.status(400).json({ error: "Invalid ID" });
     }
 
     // validate store_id
-    if (!Number.isInteger(Number(store_id))) {
+    if (!Number.isInteger(parsedStoreId)) {
       return res.status(400).json({ error: "Invalid store_id" });
     }
 
-    const result = await service.remove(Number(id), Number(store_id));
+    // CHECK QUYỀN STORE
+    if (req.user.store_id !== parsedStoreId) {
+      return res.status(403).json({ error: "Forbidden: wrong store" });
+    }
+
+    const result = await service.remove(parsedId, parsedStoreId);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Product not found" });
