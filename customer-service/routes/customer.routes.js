@@ -4,7 +4,7 @@ const router = express.Router();
 const controller = require("../controllers/customer.controller");
 const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
-// CREATE → admin + staff
+// CREATE → staff
 router.post("/", verifyToken, checkRole(["staff"]), controller.create);
 
 // GET ALL → admin + staff
