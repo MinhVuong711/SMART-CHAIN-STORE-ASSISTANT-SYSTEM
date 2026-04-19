@@ -4,9 +4,12 @@ const jwt = require("jsonwebtoken");
 
 const SECRET = process.env.JWT_SECRET;
 
+if (!SECRET) {
+  throw new Error("JWT_SECRET is missing");
+}
+
 // REGISTER
 exports.register = async (data) => {
-
   let { username, password, store_id } = data;
 
   username = username?.trim();
@@ -24,23 +27,22 @@ exports.register = async (data) => {
   const hash = await bcrypt.hash(password, 10);
 
   try {
-  await db.query(
-    "INSERT INTO users (username, password, role, store_id) VALUES (?, ?, ?, ?)",
-    [username, hash, "staff", Number(store_id)],
-  );
-} catch (err) {
-  if (err.code === "ER_DUP_ENTRY") {
-    throw new Error("Username already exists");
+    await db.query(
+      "INSERT INTO users (username, password, role, store_id) VALUES (?, ?, ?, ?)",
+      [username, hash, "staff", Number(store_id)],
+    );
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      throw new Error("Username already exists");
+    }
+    throw err;
   }
-  throw err;
-}
 
   return { message: "Register success" };
 };
 
 // LOGIN
 exports.login = async (data) => {
-
   let { username, password } = data;
 
   username = username?.trim();

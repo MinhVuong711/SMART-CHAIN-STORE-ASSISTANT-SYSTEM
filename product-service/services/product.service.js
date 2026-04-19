@@ -21,11 +21,26 @@ exports.getById = async (id, store_id) => {
 
 // CREATE PRODUCT
 exports.create = async (data) => {
-  const { name, price, description, store_id } = data;
+  let { name, price, description, store_id } = data;
+
+  // cho service tự bảo vệ bản thân hẹ hẹ
+  name = name?.trim();
+
+  if (!name || name.length === 0) {
+    throw new Error("Product name is required");
+  }
+
+  if (!Number.isFinite(price) || price <= 0) {
+    throw new Error("Invalid price");
+  }
+
+  if (!Number.isInteger(Number(store_id))) {
+    throw new Error("Invalid store_id");
+  }
 
   const [result] = await db.query(
     "INSERT INTO products (name, price, description, store_id) VALUES (?, ?, ?, ?)",
-    [name, price, description, store_id],
+    [name, price, description || null, store_id],
   );
 
   return {
@@ -36,36 +51,59 @@ exports.create = async (data) => {
 
 // UPDATE PRODUCT
 exports.update = async (id, data) => {
-  const { name, price, description, store_id } = data;
+  let { name, price, description, store_id } = data;
+
+  // VALIDATE ID + STORE_ID
+  if (!Number.isInteger(Number(id))) {
+    throw new Error("Invalid product id");
+  }
+
+  if (!Number.isInteger(Number(store_id))) {
+    throw new Error("Invalid store_id");
+  }
 
   let query = "UPDATE products SET ";
   let updates = [];
   let params = [];
 
-  // chỉ update field được gửi
+  // VALIDATE NAME
   if (name !== undefined) {
+    name = name?.trim();
+
+    if (!name) {
+      throw new Error("Product name cannot be empty");
+    }
+
     updates.push("name=?");
     params.push(name);
   }
 
+  // VALIDATE PRICE
   if (price !== undefined) {
+    if (!Number.isFinite(price) || price <= 0) {
+      throw new Error("Invalid price");
+    }
+
     updates.push("price=?");
     params.push(price);
   }
 
+  // CLEAN DESCRIPTION
   if (description !== undefined) {
+    description = description?.trim() || null;
+
     updates.push("description=?");
     params.push(description);
   }
 
-  // safety: tránh query lỗi
+  // safety
   if (updates.length === 0) {
     throw new Error("No fields to update");
   }
 
   query += updates.join(", ");
 
-  // WHERE (không cho đổi store_id)
+  // WHERE
   query += " WHERE id=? AND store_id=?";
   params.push(id, store_id);
 
