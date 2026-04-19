@@ -5,12 +5,12 @@ const controller = require("../controllers/product.controller");
 const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
 // PUBLIC
-router.get("/stores/:store_id/products", controller.getAll);
-router.get("/stores/:store_id/products/:id", controller.getById);
+router.get("/:store_id/products", controller.getAll);
+router.get("/:store_id/products/:id", controller.getById);
 
 // CREATE → chỉ admin
 router.post(
-  "/stores/:store_id/products",
+  "/:store_id/products",
   verifyToken,
   checkRole(["admin"]),
   controller.create,
@@ -18,7 +18,7 @@ router.post(
 
 // UPDATE → chỉ admin
 router.put(
-  "/stores/:store_id/products/:id",
+  "/:store_id/products/:id",
   verifyToken,
   checkRole(["admin"]),
   controller.update,
@@ -26,7 +26,7 @@ router.put(
 
 // DELETE → chỉ admin
 router.delete(
-  "/stores/:store_id/products/:id",
+  "/:store_id/products/:id",
   verifyToken,
   checkRole(["admin"]),
   controller.remove,

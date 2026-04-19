@@ -127,7 +127,7 @@ exports.update = async (req, res) => {
     const result = await service.update(
       req.params.id,
       { name, phone, email },
-      user.store_id,
+      user.role === "admin" ? null : user.store_id,
     );
 
     if (result.affectedRows === 0) {
@@ -146,7 +146,7 @@ exports.remove = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     //validate id
     if (!Number.isInteger(Number(req.params.id))) {
       return res.status(400).json({ error: "Invalid ID" });
@@ -154,7 +154,10 @@ exports.remove = async (req, res) => {
 
     const user = req.user;
 
-    const result = await service.remove(req.params.id, user.store_id);
+    const result = await service.remove(
+      req.params.id,
+      user.role === "admin" ? null : user.store_id,
+    );
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Customer not found" });

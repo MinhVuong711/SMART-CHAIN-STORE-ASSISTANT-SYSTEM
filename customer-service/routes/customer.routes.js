@@ -5,7 +5,7 @@ const controller = require("../controllers/customer.controller");
 const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
 // CREATE → admin + staff
-router.post("/", verifyToken, checkRole(["admin", "staff"]), controller.create);
+router.post("/", verifyToken, checkRole(["staff"]), controller.create);
 
 // GET ALL → admin + staff
 router.get("/", verifyToken, checkRole(["admin", "staff"]), controller.getAll);

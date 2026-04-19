@@ -68,8 +68,8 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: "Invalid data" });
     }
 
-    // 🔥 CHECK QUYỀN STORE (QUAN TRỌNG NHẤT)
-    if (req.user.store_id !== parsedStoreId) {
+    // CHECK QUYỀN STORE
+    if (req.user.role !== "admin" && req.user.store_id !== parsedStoreId) {
       return res.status(403).json({ error: "Forbidden: wrong store" });
     }
 
@@ -110,8 +110,8 @@ exports.update = async (req, res) => {
       return res.status(400).json({ error: "Invalid store_id" });
     }
 
-    // 🔥 CHECK QUYỀN STORE
-    if (req.user.store_id !== parsedStoreId) {
+    // CHECK QUYỀN STORE
+    if (req.user.role !== "admin" && req.user.store_id !== parsedStoreId) {
       return res.status(403).json({ error: "Forbidden: wrong store" });
     }
 
@@ -170,7 +170,7 @@ exports.remove = async (req, res) => {
     }
 
     // CHECK QUYỀN STORE
-    if (req.user.store_id !== parsedStoreId) {
+    if (req.user.role !== "admin" && req.user.store_id !== parsedStoreId) {
       return res.status(403).json({ error: "Forbidden: wrong store" });
     }
 

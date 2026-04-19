@@ -3,7 +3,6 @@ const service = require("../services/order.service");
 // CREATE ORDER
 exports.create = async (req, res) => {
   try {
-
     if (!req.user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -27,7 +26,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: "Invalid store_id in items" });
     }
 
-    if (firstStore !== user.store_id) {
+    if (req.user.role !== "admin" && firstStore !== user.store_id) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -63,7 +62,7 @@ exports.getAll = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     const { store_id } = req.query;
     const parsedStoreId = Number(store_id);
 

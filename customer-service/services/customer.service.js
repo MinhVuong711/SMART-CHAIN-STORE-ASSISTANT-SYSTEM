@@ -94,9 +94,14 @@ exports.update = async (id, data, store_id) => {
   }
 
   query += updates.join(", ");
-  query += " WHERE id=? AND store_id=?";
 
-  params.push(id, store_id);
+  if (store_id) {
+    query += " WHERE id=? AND store_id=?";
+    params.push(id, store_id);
+  } else {
+    query += " WHERE id=?";
+    params.push(id);
+  }
 
   const [result] = await db.query(query, params);
   return result;
@@ -104,10 +109,15 @@ exports.update = async (id, data, store_id) => {
 
 // DELETE
 exports.remove = async (id, store_id) => {
-  const [result] = await db.query(
-    "DELETE FROM customers WHERE id=? AND store_id=?",
-    [id, store_id],
-  );
+  let result;
+  if (store_id) {
+    [result] = await db.query(
+      "DELETE FROM customers WHERE id=? AND store_id=?",
+      [id, store_id],
+    );
+  } else {
+    [result] = await db.query("DELETE FROM customers WHERE id=?", [id]);
+  }
 
   return result;
 };

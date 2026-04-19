@@ -8,18 +8,26 @@ const axios = require("axios");
 exports.create = async (user, data, token) => {
   const { items, customer_id } = data;
 
-  // VALIDATE CUSTOMER
+  // VALIDATE CUSTOMER AND CHECK STORE
   try {
-    await axios.get(
+    const customerRes = await axios.get(
       `${CUSTOMER_SERVICE_URL}/customers/${customer_id}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        timeout: 3000, // timeout
-      }
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 3000,
+      },
     );
+
+    const customer = customerRes.data;
+
+    // admin bypass check store
+    if (user.role !== "admin" && customer.store_id !== user.store_id) {
+      throw new Error("Customer does not belong to this store");
+    }
   } catch (err) {
+    if (err.message === "Customer does not belong to this store") {
+      throw err; // re-throw lỗi store
+    }
     throw new Error("Customer not found");
   }
 
@@ -32,12 +40,12 @@ exports.create = async (user, data, token) => {
 
   const firstStore = Number(items[0].store_id);
 
-  if (firstStore !== user.store_id) {
-    throw new Error("Unauthorized store access");
-  }
-
   if (!Number.isInteger(firstStore)) {
     throw new Error("Invalid store_id");
+  }
+
+  if (user.role !== "admin" && firstStore !== user.store_id) {
+    throw new Error("Unauthorized store access");
   }
 
   // VALIDATE ITEMS
@@ -67,10 +75,10 @@ exports.create = async (user, data, token) => {
     productResponses = await Promise.all(
       items.map((item) =>
         axios.get(
-          `${PRODUCT_SERVICE_URL}/stores/${item.store_id}/products/${item.product_id}`,
-          { timeout: 3000 } // timeout
-        )
-      )
+          `${PRODUCT_SERVICE_URL}/${item.store_id}/products/${item.product_id}`,
+          { timeout: 3000 }, // timeout
+        ),
+      ),
     );
   } catch (err) {
     throw new Error("One or more products not found");
@@ -99,7 +107,7 @@ exports.create = async (user, data, token) => {
     // INSERT ORDER
     const [orderResult] = await conn.query(
       "INSERT INTO orders (created_by, customer_id, store_id, total_price, status) VALUES (?, ?, ?, ?, ?)",
-      [user.id, customer_id, firstStore, total, "pending"]
+      [user.id, customer_id, firstStore, total, "pending"],
     );
 
     const order_id = orderResult.insertId;
@@ -108,7 +116,7 @@ exports.create = async (user, data, token) => {
     for (let item of productList) {
       await conn.query(
         "INSERT INTO order_details (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)",
-        [order_id, item.product_id, item.price, item.quantity]
+        [order_id, item.product_id, item.price, item.quantity],
       );
     }
 
@@ -119,7 +127,6 @@ exports.create = async (user, data, token) => {
       order_id,
       total,
     };
-
   } catch (err) {
     await conn.rollback(); // rollback nếu lỗi
     throw err;
