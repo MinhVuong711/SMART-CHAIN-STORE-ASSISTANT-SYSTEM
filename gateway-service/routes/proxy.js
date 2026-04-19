@@ -15,7 +15,7 @@ module.exports = (app) => {
     createProxyMiddleware({
       target: process.env.PRODUCT_SERVICE,
       changeOrigin: true,
-      pathRewrite: { "^/": "/products/" }, // ✅
+      pathRewrite: { "^/products": "" }, // ✅
     }),
   );
 
