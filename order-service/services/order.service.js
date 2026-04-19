@@ -9,6 +9,7 @@ exports.create = async (user, data, token) => {
   const { items, customer_id } = data;
 
   // VALIDATE CUSTOMER AND CHECK STORE
+  let customerData;
   try {
     const customerRes = await axios.get(
       `${CUSTOMER_SERVICE_URL}/customers/${customer_id}`,
@@ -17,18 +18,14 @@ exports.create = async (user, data, token) => {
         timeout: 3000,
       },
     );
-
-    const customer = customerRes.data;
-
-    // admin bypass check store
-    if (user.role !== "admin" && customer.store_id !== user.store_id) {
-      throw new Error("Customer does not belong to this store");
-    }
+    customerData = customerRes.data;
   } catch (err) {
-    if (err.message === "Customer does not belong to this store") {
-      throw err; // re-throw lỗi store
-    }
     throw new Error("Customer not found");
+  }
+
+  // check store SAU khi axios xong
+  if (user.role !== "admin" && customerData.store_id !== user.store_id) {
+    throw new Error("Customer does not belong to this store");
   }
 
   if (!items || items.length === 0) {
