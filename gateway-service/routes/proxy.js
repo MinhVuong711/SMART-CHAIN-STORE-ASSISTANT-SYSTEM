@@ -1,6 +1,7 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = (app) => {
+  // AUTH — giữ nguyên vì auth service mount tại /auth
   app.use(
     "/auth",
     createProxyMiddleware({
@@ -10,6 +11,7 @@ module.exports = (app) => {
     }),
   );
 
+  // PRODUCTS — strip /products vì mount tại /
   app.use(
     "/products",
     createProxyMiddleware({
@@ -19,6 +21,7 @@ module.exports = (app) => {
     }),
   );
 
+  // ORDERS — strip /orders vì mount tại /orders
   app.use(
     "/orders",
     createProxyMiddleware({
@@ -28,6 +31,7 @@ module.exports = (app) => {
     }),
   );
 
+  // CUSTOMERS — strip /customers vì mount tại /customers
   app.use(
     "/customers",
     createProxyMiddleware({
@@ -42,7 +46,7 @@ module.exports = (app) => {
     createProxyMiddleware({
       target: process.env.STORE_SERVICE,
       changeOrigin: true,
-      pathRewrite: { "^/": "/stores/" }, // ✅
+      pathRewrite: { "^/": "/stores/" }, // ✅ giữ lại /stores/
     }),
   );
 };

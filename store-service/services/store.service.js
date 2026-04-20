@@ -3,18 +3,27 @@ const redis = require("../utils/redis");
 
 // helper clear cache
 async function clearStoreCache() {
-  const stream = redis.scanIterator({
-    MATCH: "stores:*",
-    COUNT: 100,
-  });
+  try {
+    const stream = redis.scanIterator({
+      MATCH: "stores:*",
+      COUNT: 100,
+    });
 
-  const keys = [];
-  for await (const key of stream) {
-    keys.push(key);
-  }
+    const keys = [];
+    for await (const key of stream) {
+      keys.push(key);
+    }
 
-  if (keys.length > 0) {
-    await redis.del(keys);
+    console.log("Keys to delete:", keys); // debug xem keys là gì
+
+    if (keys.length > 0) {
+      for (const key of keys) {
+        console.log("Deleting key:", key, typeof key); // xem type của key
+        await redis.del(key);
+      }
+    }
+  } catch (err) {
+    console.error("clearStoreCache error:", err.message);
   }
 }
 
