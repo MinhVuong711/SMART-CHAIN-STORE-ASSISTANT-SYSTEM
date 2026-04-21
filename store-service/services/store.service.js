@@ -14,11 +14,8 @@ async function clearStoreCache() {
       keys.push(key);
     }
 
-    console.log("Keys to delete:", keys); // debug xem keys là gì
-
     if (keys.length > 0) {
       for (const key of keys) {
-        console.log("Deleting key:", key, typeof key); // xem type của key
         await redis.del(key);
       }
     }

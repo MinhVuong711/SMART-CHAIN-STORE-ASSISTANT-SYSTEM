@@ -141,3 +141,26 @@ exports.getAll = async (store_id) => {
 
   return rows;
 };
+
+// GET ORDER DETAILS
+exports.getDetails = async (order_id) => {
+  // Lấy thông tin order
+  const [orders] = await db.query("SELECT * FROM orders WHERE id=?", [
+    order_id,
+  ]);
+
+  if (orders.length === 0) return null;
+
+  const order = orders[0];
+
+  // Lấy chi tiết items
+  const [details] = await db.query(
+    "SELECT * FROM order_details WHERE order_id=?",
+    [order_id],
+  );
+
+  return {
+    order,
+    items: details,
+  };
+};

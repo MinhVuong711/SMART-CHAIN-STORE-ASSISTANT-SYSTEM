@@ -85,3 +85,36 @@ exports.getAll = async (req, res) => {
     });
   }
 };
+
+// GET ORDER DETAILS
+exports.getDetails = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const order_id = Number(req.params.order_id);
+
+    if (!Number.isInteger(order_id) || order_id <= 0) {
+      return res.status(400).json({ error: "Invalid order_id" });
+    }
+
+    const data = await service.getDetails(order_id);
+
+    if (!data) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // staff chỉ xem order thuộc store mình
+    if (
+      req.user.role !== "admin" &&
+      data.order.store_id !== req.user.store_id
+    ) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -49,4 +49,22 @@ module.exports = (app) => {
       pathRewrite: { "^/": "/stores/" }, // ✅ giữ lại /stores/
     }),
   );
+
+  app.use(
+    "/analytics",
+    createProxyMiddleware({
+      target: process.env.ANALYTICS_SERVICE,
+      changeOrigin: true,
+      pathRewrite: { "^/": "/analytics/" },
+    }),
+  );
+
+  app.use(
+    "/ai",
+    createProxyMiddleware({
+      target: process.env.AI_SERVICE,
+      changeOrigin: true,
+      pathRewrite: { "^/": "/ai/" },
+    }),
+  );
 };
