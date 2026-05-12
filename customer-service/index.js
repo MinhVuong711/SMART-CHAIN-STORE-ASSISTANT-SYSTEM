@@ -10,6 +10,14 @@ const customerRoutes = require("./routes/customer.routes");
 app.use(express.json());
 app.use(cors());
 
+app.get("/health", (req, res) => {
+  res.json({
+    service: "customer-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/customers", customerRoutes);
 
 app.listen(3004, () => {

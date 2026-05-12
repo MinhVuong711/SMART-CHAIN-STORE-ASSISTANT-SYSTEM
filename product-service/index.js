@@ -9,6 +9,15 @@ app.use(cors());
 app.use(express.json());
 
 const productRoutes = require("./routes/product.routes");
+
+app.get("/health", (req, res) => {
+  res.json({
+    service: "product-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/", productRoutes);
 
 app.listen(3002, () => {

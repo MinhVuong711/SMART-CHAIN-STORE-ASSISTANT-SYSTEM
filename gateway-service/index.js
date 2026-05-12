@@ -8,6 +8,14 @@ const app = express();
 app.use(cors());
 // app.use(express.json());
 
+app.get("/health", (req, res) => {
+  res.json({
+    service: "gateway-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // load proxy routes
 require("./routes/proxy")(app);
 

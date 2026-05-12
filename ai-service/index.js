@@ -11,6 +11,14 @@ app.use(express.json());
 const aiRoutes = require("./routes/ai.routes");
 app.use("/ai", aiRoutes);
 
+app.get("/health", (req, res) => {
+  res.json({
+    service: "ai-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/", (req, res) => {
   res.json({ service: "ai-service running" });
 });

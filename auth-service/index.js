@@ -11,6 +11,14 @@ app.use(express.json());
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 
+app.get("/health", (req, res) => {
+  res.json({
+    service: "auth-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/", (req, res) => {
   res.json({ service: "auth-service running" });
 });

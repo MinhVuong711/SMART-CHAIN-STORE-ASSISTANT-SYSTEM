@@ -11,6 +11,14 @@ app.use(express.json());
 const analyticsRoutes = require("./routes/analytics.routes");
 app.use("/analytics", analyticsRoutes);
 
+app.get("/health", (req, res) => {
+  res.json({
+    service: "analytics-service",
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/", (req, res) => {
   res.json({ service: "analytics-service running" });
 });
