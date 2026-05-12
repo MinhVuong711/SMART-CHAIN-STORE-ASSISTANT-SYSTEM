@@ -86,7 +86,7 @@ exports.update = async (id, data, store_id) => {
 
   if (data.email !== undefined) {
     updates.push("email=?");
-    params.push(data.email.trim());
+    params.push(data.email === null ? null : data.email.trim());
   }
 
   if (updates.length === 0) {

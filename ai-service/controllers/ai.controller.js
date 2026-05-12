@@ -9,7 +9,7 @@ exports.ask = async (req, res) => {
     const { question, store_id } = req.body;
 
     // validate
-    if (!question || question.trim() === "") {
+    if (typeof question !== "string" || question.trim() === "") {
       return res.status(400).json({ error: "Question is required" });
     }
 

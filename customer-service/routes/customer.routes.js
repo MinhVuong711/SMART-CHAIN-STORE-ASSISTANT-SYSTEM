@@ -4,13 +4,13 @@ const router = express.Router();
 const controller = require("../controllers/customer.controller");
 const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
-// CREATE → staff
-router.post("/", verifyToken, checkRole(["staff"]), controller.create);
+// CREATE -> admin + staff
+router.post("/", verifyToken, checkRole(["admin", "staff"]), controller.create);
 
-// GET ALL → admin + staff
+// GET ALL -> admin + staff
 router.get("/", verifyToken, checkRole(["admin", "staff"]), controller.getAll);
 
-// GET BY ID → admin + staff
+// GET BY ID -> admin + staff
 router.get(
   "/:id",
   verifyToken,
@@ -18,7 +18,7 @@ router.get(
   controller.getById,
 );
 
-// UPDATE → admin + staff
+// UPDATE -> admin + staff
 router.put(
   "/:id",
   verifyToken,
@@ -26,7 +26,7 @@ router.put(
   controller.update,
 );
 
-// DELETE → chỉ admin
+// DELETE -> admin only
 router.delete("/:id", verifyToken, checkRole(["admin"]), controller.remove);
 
 module.exports = router;

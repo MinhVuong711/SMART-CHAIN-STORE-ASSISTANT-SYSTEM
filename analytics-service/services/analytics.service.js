@@ -2,6 +2,16 @@ const axios = require("axios");
 
 const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL;
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL;
+const REPORT_TIME_ZONE = process.env.REPORT_TIME_ZONE || "Asia/Bangkok";
+
+function formatReportDate(dateValue) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: REPORT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(dateValue));
+}
 
 // Helper: lấy tất cả orders của store
 async function fetchOrders(store_id, token) {
@@ -59,7 +69,7 @@ exports.getDailyRevenue = async (store_id, token) => {
 
   for (const order of orders) {
     // Lấy ngày từ created_at
-    const date = new Date(order.created_at).toISOString().split("T")[0];
+    const date = formatReportDate(order.created_at);
 
     if (!dailyMap[date]) {
       dailyMap[date] = {
@@ -83,20 +93,24 @@ exports.getDailyRevenue = async (store_id, token) => {
 
 // GET TOP PRODUCTS — dùng order details thật ✅
 exports.getTopProducts = async (store_id, limit = 5, token) => {
+  if (!Number.isInteger(limit) || limit <= 0 || limit > 50) {
+    throw new Error("limit must be between 1 and 50");
+  }
+
   const orders = await fetchOrders(store_id, token);
 
   if (orders.length === 0) {
     return { store_id, top_products: [] };
   }
 
-  // Lấy details của tất cả orders song song - 1 order fail vẫn chạy tiếp
-  const allSettled = await Promise.allSettled(
-    orders.map((order) => fetchOrderDetails(order.id, token)),
-  );
-
-  const allDetails = allSettled
-    .filter((r) => r.status === "fulfilled")
-    .map((r) => r.value);
+  let allDetails;
+  try {
+    allDetails = await Promise.all(
+      orders.map((order) => fetchOrderDetails(order.id, token)),
+    );
+  } catch (err) {
+    throw new Error("Failed to fetch order details for analytics");
+  }
 
   // Gộp tất cả items lại, đếm số lượng bán theo product
   const productSales = {};
@@ -156,9 +170,9 @@ exports.getSummary = async (store_id, token) => {
   );
 
   // Doanh thu hôm nay
-  const today = new Date().toISOString().split("T")[0];
+  const today = formatReportDate(new Date());
   const todayOrders = orders.filter((o) => {
-    const orderDate = new Date(o.created_at).toISOString().split("T")[0];
+    const orderDate = formatReportDate(o.created_at);
     return orderDate === today;
   });
 

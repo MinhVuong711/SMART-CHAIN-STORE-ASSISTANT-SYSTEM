@@ -13,6 +13,20 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: "Store name is required" });
     }
 
+    if (typeof name !== "string") {
+      return res.status(400).json({ error: "Store name must be a string" });
+    }
+
+    if (name.trim() === "") {
+      return res.status(400).json({ error: "Store name cannot be empty" });
+    }
+
+    if (address !== undefined && address !== null && typeof address !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Store address must be a string or null" });
+    }
+
     const result = await service.create({ name, address });
 
     res.status(201).json(result);
@@ -87,6 +101,22 @@ exports.update = async (req, res) => {
 
     if (name === undefined && address === undefined) {
       return res.status(400).json({ error: "No data to update" });
+    }
+
+    if (name !== undefined) {
+      if (name === null || typeof name !== "string") {
+        return res.status(400).json({ error: "Store name must be a string" });
+      }
+
+      if (name.trim() === "") {
+        return res.status(400).json({ error: "Store name cannot be empty" });
+      }
+    }
+
+    if (address !== undefined && address !== null && typeof address !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Store address must be a string or null" });
     }
 
     const result = await service.update(id, { name, address });

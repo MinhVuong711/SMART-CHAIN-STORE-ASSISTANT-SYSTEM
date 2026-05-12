@@ -8,27 +8,27 @@ const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 router.get("/:store_id/products", controller.getAll);
 router.get("/:store_id/products/:id", controller.getById);
 
-// CREATE → chỉ admin
+// CREATE -> admin + staff
 router.post(
   "/:store_id/products",
   verifyToken,
-  checkRole(["admin"]),
+  checkRole(["admin", "staff"]),
   controller.create,
 );
 
-// UPDATE → chỉ admin
+// UPDATE -> admin + staff
 router.put(
   "/:store_id/products/:id",
   verifyToken,
-  checkRole(["admin"]),
+  checkRole(["admin", "staff"]),
   controller.update,
 );
 
-// DELETE → chỉ admin
+// DELETE -> admin + staff
 router.delete(
   "/:store_id/products/:id",
   verifyToken,
-  checkRole(["admin"]),
+  checkRole(["admin", "staff"]),
   controller.remove,
 );
 

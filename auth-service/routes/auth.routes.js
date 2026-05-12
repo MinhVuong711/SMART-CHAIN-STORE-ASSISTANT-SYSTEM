@@ -2,15 +2,20 @@ const express = require("express");
 const router = express.Router();
 
 const authController = require("../controllers/auth.controller");
-const { verifyToken } = require("../../shared/auth.middleware");
+const { verifyToken, checkRole } = require("../../shared/auth.middleware");
 
 // TEST ROUTE (public)
 router.get("/test", (req, res) => {
   res.send("AUTH OK");
 });
 
-// REGISTER (public)
-router.post("/register", authController.register);
+// REGISTER STAFF (admin only)
+router.post(
+  "/register",
+  verifyToken,
+  checkRole(["admin"]),
+  authController.register,
+);
 
 // LOGIN (public)
 router.post("/login", authController.login);

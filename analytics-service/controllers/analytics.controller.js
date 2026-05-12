@@ -70,6 +70,10 @@ exports.getTopProducts = async (req, res) => {
       return res.status(400).json({ error: "Invalid store_id" });
     }
 
+    if (!Number.isInteger(parsedLimit) || parsedLimit <= 0 || parsedLimit > 50) {
+      return res.status(400).json({ error: "limit must be between 1 and 50" });
+    }
+
     if (req.user.role !== "admin" && req.user.store_id !== parsedStoreId) {
       return res.status(403).json({ error: "Forbidden" });
     }

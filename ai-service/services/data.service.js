@@ -67,10 +67,13 @@ exports.getOrders = async (store_id, token) => {
 
 // Lấy danh sách customers
 exports.getCustomers = async (store_id, token) => {
-  const res = await axios.get(`${CUSTOMER_SERVICE_URL}/customers`, {
-    headers: { Authorization: `Bearer ${token}` },
-    timeout: 5000,
-  });
+  const res = await axios.get(
+    `${CUSTOMER_SERVICE_URL}/customers?store_id=${store_id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      timeout: 5000,
+    },
+  );
   return res.data;
 };
 

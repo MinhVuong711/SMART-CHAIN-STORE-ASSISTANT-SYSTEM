@@ -23,11 +23,6 @@ exports.create = async (user, data, token) => {
     throw new Error("Customer not found");
   }
 
-  // check store SAU khi axios xong
-  if (user.role !== "admin" && customerData.store_id !== user.store_id) {
-    throw new Error("Customer does not belong to this store");
-  }
-
   if (!items || items.length === 0) {
     throw new Error("Order must have items");
   }
@@ -39,6 +34,10 @@ exports.create = async (user, data, token) => {
 
   if (!Number.isInteger(firstStore)) {
     throw new Error("Invalid store_id");
+  }
+
+  if (Number(customerData.store_id) !== firstStore) {
+    throw new Error("Customer does not belong to this store");
   }
 
   if (user.role !== "admin" && firstStore !== user.store_id) {

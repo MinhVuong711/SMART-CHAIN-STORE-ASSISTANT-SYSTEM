@@ -60,9 +60,13 @@ exports.create = async (data) => {
 exports.getAll = async (page = 1, limit = 10) => {
   const cacheKey = `stores:${page}:${limit}`;
 
-  const cached = await redis.get(cacheKey);
-  if (cached) {
-    return JSON.parse(cached);
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  } catch (err) {
+    console.error("store cache get error:", err.message);
   }
 
   const offset = (page - 1) * limit;
@@ -72,9 +76,13 @@ exports.getAll = async (page = 1, limit = 10) => {
     [limit, offset],
   );
 
-  await redis.set(cacheKey, JSON.stringify(rows), {
-    EX: 60,
-  });
+  try {
+    await redis.set(cacheKey, JSON.stringify(rows), {
+      EX: 60,
+    });
+  } catch (err) {
+    console.error("store cache set error:", err.message);
+  }
 
   return rows;
 };
@@ -95,6 +103,10 @@ exports.update = async (id, data) => {
   let params = [];
 
   if (data.name !== undefined) {
+    if (data.name === null || typeof data.name !== "string") {
+      throw new Error("Store name must be a string");
+    }
+
     const name = data.name.trim();
 
     if (!name) {
@@ -106,8 +118,12 @@ exports.update = async (id, data) => {
   }
 
   if (data.address !== undefined) {
+    if (data.address !== null && typeof data.address !== "string") {
+      throw new Error("Store address must be a string or null");
+    }
+
     updates.push("address=?");
-    params.push(data.address.trim());
+    params.push(data.address === null ? null : data.address.trim());
   }
 
   if (updates.length === 0) {

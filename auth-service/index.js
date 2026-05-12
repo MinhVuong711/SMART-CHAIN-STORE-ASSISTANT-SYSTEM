@@ -19,14 +19,22 @@ const bcrypt = require("bcrypt");
 const db = require("./db");
 
 async function createDefaultAdmin() {
+  const adminUsername = process.env.DEFAULT_ADMIN_USERNAME;
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+
+  if (!adminUsername || !adminPassword) {
+    console.log("Default admin creation skipped: missing admin env config");
+    return;
+  }
+
   const [rows] = await db.query("SELECT * FROM users WHERE role = 'admin'");
 
   if (rows.length === 0) {
-    const hash = await bcrypt.hash("123456", 10);
+    const hash = await bcrypt.hash(adminPassword, 10);
 
     await db.query(
       "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-      ["admin", hash, "admin"],
+      [adminUsername, hash, "admin"],
     );
 
     console.log("🔥 Default admin created");

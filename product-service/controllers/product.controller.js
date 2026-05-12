@@ -45,7 +45,7 @@ exports.getById = async (req, res) => {
   }
 };
 
-// CREATE (ADMIN ONLY)
+// CREATE (ADMIN + STAFF)
 exports.create = async (req, res) => {
   try {
     if (!req.user) {
@@ -58,9 +58,19 @@ exports.create = async (req, res) => {
     const parsedStoreId = Number(store_id);
     const parsedPrice = Number(price);
 
+    if (typeof name !== "string") {
+      return res.status(400).json({ error: "Product name must be a string" });
+    }
+
+    if (description !== undefined && description !== null && typeof description !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Description must be a string or null" });
+    }
+
     // validate input
     if (
-      !name ||
+      name.trim() === "" ||
       isNaN(parsedPrice) ||
       parsedPrice <= 0 ||
       !Number.isInteger(parsedStoreId)
@@ -86,7 +96,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// UPDATE (ADMIN ONLY)
+// UPDATE (ADMIN + STAFF)
 exports.update = async (req, res) => {
   try {
     if (!req.user) {
@@ -108,6 +118,16 @@ exports.update = async (req, res) => {
     // validate store_id
     if (!Number.isInteger(parsedStoreId)) {
       return res.status(400).json({ error: "Invalid store_id" });
+    }
+
+    if (name !== undefined && (name === null || typeof name !== "string")) {
+      return res.status(400).json({ error: "Product name must be a string" });
+    }
+
+    if (description !== undefined && description !== null && typeof description !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Description must be a string or null" });
     }
 
     // CHECK QUYỀN STORE
@@ -147,7 +167,7 @@ exports.update = async (req, res) => {
   }
 };
 
-// DELETE (ADMIN ONLY)
+// DELETE (ADMIN + STAFF)
 exports.remove = async (req, res) => {
   try {
     if (!req.user) {

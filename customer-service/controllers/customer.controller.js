@@ -7,22 +7,38 @@ exports.create = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { name, phone } = req.body;
+    const { name, phone, store_id } = req.body;
 
     if (!name || !phone) {
       return res.status(400).json({ error: "Missing name or phone" });
     }
 
+    if (typeof name !== "string" || typeof phone !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Name and phone must be strings" });
+    }
+
+    if (name.trim() === "") {
+      return res.status(400).json({ error: "Name cannot be empty" });
+    }
+
     // validate phone format
-    if (!/^[0-9]{9,11}$/.test(phone)) {
+    if (!/^[0-9]{9,11}$/.test(phone.trim())) {
       return res.status(400).json({ error: "Invalid phone format" });
     }
 
     const user = req.user;
+    const targetStoreId =
+      user.role === "admin" ? Number(store_id) : user.store_id;
+
+    if (!Number.isInteger(Number(targetStoreId)) || Number(targetStoreId) <= 0) {
+      return res.status(400).json({ error: "Invalid store_id" });
+    }
 
     const result = await service.create({
       ...req.body,
-      store_id: user.store_id,
+      store_id: Number(targetStoreId),
     });
 
     res.status(201).json(result);
@@ -41,10 +57,20 @@ exports.getAll = async (req, res) => {
     const user = req.user;
 
     let data;
+    const queryStoreId = req.query.store_id;
 
-    // admin xem tất cả
     if (user.role === "admin") {
-      data = await service.getAll(); // không truyền store_id
+      if (queryStoreId !== undefined) {
+        const parsedStoreId = Number(queryStoreId);
+
+        if (!Number.isInteger(parsedStoreId) || parsedStoreId <= 0) {
+          return res.status(400).json({ error: "Invalid store_id" });
+        }
+
+        data = await service.getAll(parsedStoreId);
+      } else {
+        data = await service.getAll();
+      }
     }
     // staff chỉ xem store của mình
     else {
@@ -103,9 +129,26 @@ exports.update = async (req, res) => {
 
     let { name, phone, email } = req.body;
 
-    if (name !== undefined) name = name.trim();
-    if (phone !== undefined) phone = phone.trim();
-    if (email !== undefined) email = email.trim();
+    if (name !== undefined) {
+      if (name === null || typeof name !== "string") {
+        return res.status(400).json({ error: "Name must be a string" });
+      }
+      name = name.trim();
+    }
+
+    if (phone !== undefined) {
+      if (phone === null || typeof phone !== "string") {
+        return res.status(400).json({ error: "Phone must be a string" });
+      }
+      phone = phone.trim();
+    }
+
+    if (email !== undefined && email !== null) {
+      if (typeof email !== "string") {
+        return res.status(400).json({ error: "Email must be a string or null" });
+      }
+      email = email.trim();
+    }
 
     // validate body (phải có ít nhất 1 field)
     if (name === undefined && phone === undefined && email === undefined) {
