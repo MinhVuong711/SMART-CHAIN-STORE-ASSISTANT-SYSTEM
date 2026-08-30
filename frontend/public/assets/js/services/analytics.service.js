@@ -1,0 +1,1 @@
+import api from "../core/api-client.js"; export const getSummary=id=>api.get(`/analytics/summary?store_id=${id}`).then(r=>r.data); export const getDailyRevenue=id=>api.get(`/analytics/revenue/daily?store_id=${id}`).then(r=>r.data); export const getTopProducts=id=>api.get(`/analytics/top-products?store_id=${id}&limit=5`).then(r=>r.data);

@@ -1,0 +1,1 @@
+export const message=error=>{const s=error?.response?.status;return s===401?"Phiên đăng nhập đã hết hạn.":s===403?"Bạn không có quyền xem dữ liệu này.":s===404?"Không tìm thấy dữ liệu.":"Không thể tải dữ liệu lúc này."};
