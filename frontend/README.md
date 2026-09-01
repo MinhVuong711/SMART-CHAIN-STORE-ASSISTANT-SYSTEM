@@ -1,6 +1,6 @@
 # Smart Chain Store – Frontend
 
-Dashboard Home cho hệ thống quản lý chuỗi cửa hàng. Frontend là service Express tĩnh, không thay đổi backend.
+Frontend dashboard cho hệ thống quản lý chuỗi cửa hàng, chạy độc lập bằng Express và không thay đổi backend.
 
 ## Công nghệ
 
@@ -15,8 +15,19 @@ copy .env.example .env
 npm run dev
 ```
 
-Mở `http://localhost:8080`; health check tại `http://localhost:8080/health`. API Gateway mặc định là `http://localhost:3000` và có thể đổi bằng `API_GATEWAY_URL` trong `.env`.
+Mở `http://localhost:8080`; health check tại `http://localhost:8080/health`. API Gateway mặc định là `http://localhost:3000`, có thể đổi bằng `API_GATEWAY_URL` trong `.env`.
 
-Home dùng token trong localStorage với key `smart_chain_access_token`. Khi chưa có trang Login, có thể đăng nhập qua backend rồi đặt token tạm thời trong DevTools (không ghi token thật vào source hoặc tài liệu). Frontend không gọi trực tiếp các cổng service 3001–3007.
+## Các trang
 
-Các trang Cửa hàng, Sản phẩm, Khách hàng, Đơn hàng, Thống kê, Trợ lý AI và Nhân viên mới chỉ là menu chuẩn bị; chúng hiển thị thông báo đang phát triển.
+- Đăng nhập và đăng xuất
+- Tổng quan
+- Quản lý cửa hàng
+- Quản lý sản phẩm
+- Quản lý khách hàng
+- Quản lý đơn hàng
+- Thống kê
+- Trợ lý AI
+
+Tài khoản Staff được Admin tạo qua `POST /auth/register`. Backend chưa có đủ API CRUD để xây dựng trang quản lý nhân viên.
+
+Frontend gọi API qua Gateway và tự động gắn JWT từ localStorage; không gọi trực tiếp các service nội bộ.

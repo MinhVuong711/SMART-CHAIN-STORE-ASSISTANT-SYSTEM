@@ -1,1 +1,1 @@
-import api from "../core/api-client.js"; export const getOrders=id=>api.get(`/orders?store_id=${id}`).then(r=>r.data);
+import api from "../core/api-client.js"; const id=n=>{if(!Number.isInteger(Number(n))||Number(n)<=0)throw new Error("Mã không hợp lệ");return Number(n)}; export const getOrders=s=>api.get(`/orders?store_id=${id(s)}`).then(r=>r.data); export const getOrderDetails=n=>api.get(`/orders/${id(n)}/details`).then(r=>r.data); export const createOrder=p=>api.post("/orders",p).then(r=>r.data);

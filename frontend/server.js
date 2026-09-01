@@ -14,6 +14,10 @@ app.get("/app-config.js", (_req, res) => {
 app.get(["/login", "/login/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/login/index.html")));
 app.get(["/stores", "/stores/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/stores/index.html")));
 app.get(["/products", "/products/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/products/index.html")));
+app.get(["/customers", "/customers/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/customers/index.html")));
+app.get(["/orders", "/orders/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/orders/index.html")));
+app.get(["/analytics", "/analytics/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/analytics/index.html")));
+app.get(["/ai", "/ai/"], (_req, res) => res.sendFile(path.join(__dirname, "public/pages/ai/index.html")));
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public/pages/home/index.html")));
 app.listen(port, () => console.log(`Frontend running on port ${port}`));
